@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+<body>
+<p>
+    Current server time is
+    <span th:text="${serverTime}"></span>
+    <a th:href="@{/employees/search}">Buscar Empleados</a>
+</p>
+
+</body>
+</html>
