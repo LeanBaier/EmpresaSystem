@@ -2,11 +2,7 @@ package api.system.empresa.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -25,4 +21,11 @@ public class GetEmployeesRequest implements Serializable {
     private Integer size;
     private String order;
 
+    public static GetEmployeesRequest buildDefault() {
+        return GetEmployeesRequest.builder()
+                .page(1)
+                .size(20)
+                .order("ASC")
+                .build();
+    }
 }

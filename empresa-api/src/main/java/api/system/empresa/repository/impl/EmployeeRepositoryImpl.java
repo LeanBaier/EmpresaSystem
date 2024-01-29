@@ -43,7 +43,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
     @Override
     public PagedData<EmployeeModel> getEmployeeModels(Integer page, Integer size) {
         int indexEnd = page > 1 ?
-                       (page - 1) * size :
+                       (page) * size :
                        size;
         int indexStart = indexEnd - size;
         if (models.size() > indexStart) {

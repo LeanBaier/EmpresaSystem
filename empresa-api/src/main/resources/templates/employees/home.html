@@ -9,7 +9,7 @@
 <p>
     Current server time is
     <span th:text="${serverTime}"></span>
-    <a th:href="@{/employees/search}">Buscar Empleados</a>
+    <a th:href="@{/employees/search(page=1, size=20)}">Buscar Empleados</a>
 </p>
 
 </body>

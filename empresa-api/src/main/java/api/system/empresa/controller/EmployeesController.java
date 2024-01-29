@@ -9,11 +9,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Date;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Controller
@@ -29,36 +27,16 @@ public class EmployeesController {
     }
 
     @GetMapping("/search")
-    public String searchView(Model model) {
-        GetEmployeesRequest filters = (GetEmployeesRequest) model.getAttribute("filters");
-        if (Objects.isNull(filters)) {
-            filters = buildDefaultFilters();
-        }
-        var employeeModelList = employeeService.getEmployees(filters);
-        model.addAttribute("employees", employeeModelList);
-        model.addAttribute("filters", filters);
-        return "employees/search";
-    }
-
-    @PostMapping("/search")
-    public String getEmployeesByFilters(@ModelAttribute("filters")
-                                        @Valid
-                                        GetEmployeesRequest filters, BindingResult bindingResult, Model model) {
+    public String searchView(@Valid @ModelAttribute("filters") GetEmployeesRequest filters, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            filters = buildDefaultFilters();
+            return "employees/search";
+        }
+        if (model.containsAttribute("filters.size") && !model.getAttribute("filters.size").equals(filters.getSize().toString())) {
+            filters.setSize((Integer) model.getAttribute("filters.size"));
         }
         var employeeModelList = employeeService.getEmployees(filters);
         model.addAttribute("employees", employeeModelList);
-
         return "employees/search";
     }
 
-    private GetEmployeesRequest buildDefaultFilters() {
-        return GetEmployeesRequest.builder()
-                                  .page(1)
-                                  .size(20)
-                                  .order("ASC")
-                                  .build();
-
-    }
 }

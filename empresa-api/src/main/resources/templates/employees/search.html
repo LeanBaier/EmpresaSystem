@@ -35,68 +35,54 @@
             </tr>
             </tbody>
         </table>
-        <form class="pagination is-centered" action="#" th:action="@{/employees/search}"
-              th:object="${filters}"
-              method="post">
-            <div th:if="${employees.page > 1}">
-                <button type="submit" th:href="@{/employees/search}" th:field="*{page}" th:value="${employees.page - 1}"
-                        class="pagination-previous">Previous
-                </button>
-            </div>
-            <div th:if="${employees.page == 1}">
-                <p class="pagination-previous is-disabled">Previous</p>
-            </div>
-            <a class="pagination-next">Next page</a>
+        <nav th:if="${employees != null}" class="pagination is-centered" role="navigation" aria-label="pagination">
+            <a type="submit" class="pagination-previous" th:if="${filters.page > 1}"
+               th:href="@{/employees/search(page=${filters.page - 1}, size=${filters.size})}">Previous</a>
+            <a class="pagination-previous is-disabled" th:unless="${filters.page > 1}">Previous</a>
+            <a type="submit" class="pagination-next" th:if="${filters.page < employees.totalPages}"
+               th:href="@{/employees/search(page=${filters.page + 1}, size=${filters.size})}">Next page</a>
+            <a class="pagination-next is-disabled" th:unless="${employees.page < employees.totalPages}">Next page</a>
             <ul class="pagination-list">
-                <li>
-                    <button type="submit" th:href="@{/employees/search}" class="pagination-link"
-                            th:field="${filters.page}" th:value="1">1
-                    </button>
-                </li>
+                <li><a class="pagination-link" th:href="@{/employees/search(page=1, size=${filters.size})}"
+                       th:text="1"></a></li>
                 <li><span class="pagination-ellipsis">&hellip;</span></li>
-                <li th:if="${employees.page > 1}">
-                    <button type="submit" th:href="@{/employees/search}"
-                            class="pagination-link" th:field="*{page}"
-                            th:value="${employees.page - 1}"
-                            th:text="${employees.page - 1}"></button>
+                <li th:if="${employees.page > 1}"><a class="pagination-link"
+                                                     th:href="@{/employees/search(page=${employees.page - 1}, size=${filters.size})}"
+                                                     th:text="${employees.page - 1}"></a></li>
+                <li><a class="pagination-link is-current"
+                       th:href="@{/employees/search(page=${employees.page}, size=${filters.size})}"
+                       th:text="${employees.page}"></a></li>
+                <li th:if="${employees.page < employees.totalPages}"><a class="pagination-link"
+                                                                        th:href="@{/employees/search(page=${employees.page + 1}, size=${filters.size})}"
+                                                                        th:text="${employees.page + 1}"></a></li>
+                <li th:if="${employees.page != employees.totalPages}"><span class="pagination-ellipsis">&hellip;</span>
                 </li>
-                <li>
-                    <button type="submit" th:href="@{/employees/search}" class="pagination-link is-current"
-                            th:field="${employees.page}"
-                            th:text="${employees.page}"></button>
-                </li>
-                <li th:if="${employees.totalPages > employees.page}">
-                    <button type="submit" th:href="@{/employees/search}"
-                            class="pagination-link"
-                            th:field="*{page}"
-                            th:value="${employees.page + 1}"
-                            th:text="${employees.page + 1}"></button>
-                </li>
-                <li><span class="pagination-ellipsis">&hellip;</span></li>
-                <li>
-                    <button type="submit" class="pagination-link" th:field="*{page}" th:value="${employees.totalPages}"
-                            th:text="${employees.totalPages}"></button>
-                </li>
+                <li th:if="${employees.page != employees.totalPages}"><a class="pagination-link"
+                                                                         th:href="@{/employees/search(page=${employees.totalPages}, size=${filters.size})}"
+                                                                         th:text="${employees.totalPages}"></a></li>
             </ul>
-            <div class="field is-horizontal">
-                <div class="field-label is-normal">
-                    <label class="label">Tamaño Página</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <p class="control">
-                            <input class="input" type="number" th:field="*{size}" placeholder="Cant. Registros"/>
-                            <span>
-                                <ul>
-                                    <li th:errors="*{size}" class="help is-danger"></li>
-                                </ul>
-                            </span>
-                        </p>
-                    </div>
+        </nav>
+        <form method="get" action="#" th:action="@{/employees/search(page=${filters.page}, size=${filters.size})}"
+              th:object="${filters}">
+            <button type="submit" class="button is-info">Cambiar tamaño</button>
+            <input th:if="${employees != null}" th:field="${filters.page}" th:value="${employees.page}" hidden="hidden"
+                   placeholder="Numero de Página"/>
+            <input th:unless="${employees != null}" th:field="${filters.page}" th:value="10" hidden="hidden"
+                   placeholder="Numero de Página"/>
+
+
+            <label class="label">Registros por pagina</label>
+            <div class="control">
+                <p th:if="${#fields.hasErrors('size')}" th:errorclass="error" th:errors="*{size}"
+                   class="help is-danger"></p>
+                <div class="field">
+                    <input class="input" type="number" th:field="*{size}" placeholder="Registros por Página" id="size">
                 </div>
             </div>
+
         </form>
     </div>
+
 </div>
 </body>
 </html>
