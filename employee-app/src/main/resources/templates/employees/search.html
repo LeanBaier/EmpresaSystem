@@ -6,110 +6,96 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
-<div class="container">
+<div th:fragment="main" class="container">
+    <div class="block" id="employeesTable">
+        <div class="table-container">
+            <table class="table is-striped is-fullwidth">
+                <thead>
+                <tr>
+                    <th>Acciones</th>
+                    <th>Legajo</th>
+                    <th>Empleado</th>
+                    <th>Fecha Nacimiento</th>
+                    <th>Fecha Ingreso</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-if="employees" v-for="employee in employees" :key="employee.idEmployee">
+                    <td></td>
+                    <td>{{employee.idEmployee}}</td>
+                    <td>{{employee.name}} {{employee.lastname}}</td>
+                    <td>{{employee.birthdate}}</td>
+                    <td>{{employee.registrationDate}}</td>
+                </tr>
+                </tbody>
 
-    <h1>Busqueda de empleados</h1>
-    <a th:href="@{/employees/home}">Home</a>
-    <!--/*@thymesVar id="filters" type="app.system.employee.dto.GetEmployeesRequest"*/-->
-    <div class="block">
+            </table>
+        </div>
+        <div>
+            <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                <button :class="{'is-disabled': firstPage, 'is-loading': loading}" @click="fetchData(prevPage)" class="pagination-previous">Previous</button>
+                <button :class="{'is-disabled': lastPage, 'is-loading': loading}" @click="fetchData(nextPage)" class="pagination-next">Next page</button>
+                <ul class="pagination-list">
+                    <li><button :class="{'is-loading': loading}" class="pagination-link" @click="fetchData(1)" aria-label="Goto page 1">1</button></li>
+                    <li><span class="pagination-ellipsis">&hellip;</span></li>
+                    <li v-if="!firstPage"><button :class="{'is-loading': loading}" class="pagination-link" @click="fetchData(prevPage)" >{{ prevPage }}</button></li>
+                    <li><button :class="{'is-loading': loading}" class="pagination-link is-current">{{ page }}</button></li>
+                    <li v-if="!lastPage"><button :class="{'is-loading': loading}" class="pagination-link" @click="fetchData(nextPage)">{{ nextPage }}</button></li>
+                    <li><span class="pagination-ellipsis">&hellip;</span></li>
+                    <li><button :class="{'is-loading': loading}" class="pagination-link" @click="fetchData(totalPages)">{{ totalPages }}</button></li>
+                </ul>
+            </nav>
+        </div>
     </div>
-    <div class="block table-container">
-        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-            <thead>
-            <tr>
-                <th><abbr>Acciones</abbr></th>
-                <th><abbr>Legajo</abbr></th>
-                <th><abbr>Nombre</abbr></th>
-                <th><abbr>Apellido</abbr></th>
-                <th><abbr>Fecha de nacimiento</abbr></th>
-                <th><abbr>Ingreso</abbr></th>
-            </tr>
-            </thead>
-            <tbody th:if="${employees != null}">
+    <script th:src="@{/js/vue.global.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script th:inline="javascript">
+        const {createApp, ref} = Vue
 
-            <tr th:each="employee : ${employees.data}">
-                <td>
-                    <a th:href="@{employees/{id_employee}(id_employee = ${employee.idEmployee})}"
-                       class="button is-primary is-small">
-                        Editar
-                    </a>
-                    <button class="button is-danger is-small"
-                            th:onclick="deleteEmployee([[${employee.idEmployee}]])">
-                        Borrar
-                    </button>
-                </td>
-                <td th:text="${employee.idEmployee}"></td>
-                <td th:text="${employee.name}"></td>
-                <td th:text="${employee.lastname}"></td>
-                <td th:text="${#dates.format(employee.birthdate, 'dd-MM-yyyy')}"></td>
-                <td th:text="${#dates.format(employee.registrationDate, 'dd-MM-yyyy HH:mm:ss')}"></td>
-            </tr>
-            </tbody>
-        </table>
-        <nav th:if="${employees != null}" class="pagination is-centered" role="navigation" aria-label="pagination">
-            <a type="submit" class="pagination-previous" th:if="${filters.page > 1}"
-               th:href="@{/employees/search(page=${filters.page - 1}, size=${filters.size})}">Previous</a>
-            <a class="pagination-previous is-disabled" th:unless="${filters.page > 1}">Previous</a>
-            <a type="submit" class="pagination-next" th:if="${filters.page < employees.totalPages}"
-               th:href="@{/employees/search(page=${filters.page + 1}, size=${filters.size})}">Next page</a>
-            <a class="pagination-next is-disabled" th:unless="${employees.page < employees.totalPages}">Next page</a>
-            <ul class="pagination-list">
-                <li><a class="pagination-link" th:href="@{/employees/search(page=1, size=${filters.size})}"
-                       th:text="1"></a></li>
-                <li><span class="pagination-ellipsis">&hellip;</span></li>
-                <li th:if="${employees.page > 1}"><a class="pagination-link"
-                                                     th:href="@{/employees/search(page=${employees.page - 1}, size=${filters.size})}"
-                                                     th:text="${employees.page - 1}"></a></li>
-                <li><a class="pagination-link is-current"
-                       th:href="@{/employees/search(page=${employees.page}, size=${filters.size})}"
-                       th:text="${employees.page}"></a></li>
-                <li th:if="${employees.page < employees.totalPages}"><a class="pagination-link"
-                                                                        th:href="@{/employees/search(page=${employees.page + 1}, size=${filters.size})}"
-                                                                        th:text="${employees.page + 1}"></a></li>
-                <li th:if="${employees.page != employees.totalPages}"><span class="pagination-ellipsis">&hellip;</span>
-                </li>
-                <li th:if="${employees.page != employees.totalPages}"><a class="pagination-link"
-                                                                         th:href="@{/employees/search(page=${employees.totalPages}, size=${filters.size})}"
-                                                                         th:text="${employees.totalPages}"></a></li>
-            </ul>
-        </nav>
-        <form method="get" action="#" th:action="@{/employees/search(page=${filters.page}, size=${filters.size})}"
-              th:object="${filters}">
-            <button type="submit" class="button is-info">Cambiar tamaño</button>
-            <input th:if="${employees != null}" th:field="${filters.page}" th:value="${employees.page}" hidden="hidden"
-                   placeholder="Numero de Página"/>
-            <input th:unless="${employees != null}" th:field="${filters.page}" th:value="10" hidden="hidden"
-                   placeholder="Numero de Página"/>
+        const tableApp = createApp({
+            data() {
+                return {
+                    employees: null,
+                    page: 1,
+                    size: 10,
+                    totalPages: null,
+                    totalRecords: null,
+                    loading: true,
+                    firstPage: true,
+                    lastPage: false,
+                    prevPage: 0,
+                    nextPage: 2,
+                }
+            },
+            created() {
+                this.fetchData(1)
+            },
+            methods: {
+                fetchData(page) {
+                    this.loading = true
+                    axios.get("/api/v1/employees/search?page=" + page + "&size=" + this.size)
+                        .then(result => {
+                            result = result.data
+                            console.log(result)
+                            this.employees = result.data
+                            this.page = result.page
+                            this.prevPage = result.page - 1
+                            this.nextPage = result.page + 1
+                            this.totalPages = result.totalPages
+                            this.totalRecords = result.totalRecords
+                            this.firstPage = result.page <= 1
+                            this.lastPage = result.page >= result.totalPages
+                            this.loading = false
+                        })
+                },
+            },
 
+        })
 
-            <label class="label">Registros por pagina</label>
-            <div class="control">
-                <p th:if="${#fields.hasErrors('size')}" th:errorclass="error" th:errors="*{size}"
-                   class="help is-danger"></p>
-                <div class="field">
-                    <input class="input" type="number" th:field="*{size}" placeholder="Registros por Página" id="size">
-                </div>
-            </div>
+        tableApp.mount('#employeesTable')
 
-        </form>
-    </div>
-
+    </script>
 </div>
-<script th:inline="javascript">
-    async function deleteEmployee(idEmployee) {
-        const message = "Desea elminar al empleado con legajo: " + idEmployee;
-        console.log(message);
-        const decition = confirm(message);
-        if (decition) {
-            const result = await fetch("/api/v1/employees/" + idEmployee, {
-                method: "DELETE"
-            });
-            console.log(result);
-            window.location.reload();
-        } else {
-            console.log("cancelado")
-        }
-    }
-</script>
+
 </body>
 </html>
