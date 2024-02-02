@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Employee System</title>
@@ -9,7 +9,6 @@
 <div th:fragment="main">
     Current server time is
     <span th:text="${serverTime}"></span>
-    <a th:href="@{/employees/search(page=1, size=20)}">Buscar Empleados</a>
 </div>
 
 </body>

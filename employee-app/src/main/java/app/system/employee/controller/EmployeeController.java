@@ -2,6 +2,7 @@ package app.system.employee.controller;
 
 import app.system.employee.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +12,6 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/employees")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -24,7 +24,7 @@ public class EmployeeController {
         return "general";
     }
 
-    @GetMapping("/search")
+    @GetMapping("/employees/search")
     public String searchView(Model model) {
         model.addAttribute("fragmentName", "employees/search");
         model.addAttribute("fragmentTag", "main");

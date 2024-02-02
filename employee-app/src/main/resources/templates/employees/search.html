@@ -1,13 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Employee System</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
-<div th:fragment="main" class="container">
+<div th:fragment="main" class="container" sec:authorize="hasRole('ROLE_USER')">
     <div class="block" id="employeesTable">
+        <form @submit.prevent="onSubmit">
+            <div class="columns">
+                <div class="column is-4-desktop">
+                    <div class="field">
+                        <label class="label">Nombre</label>
+                        <div class="control">
+                            <input v-model="filters.name" class="input is-primary" type="text">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Apellido</label>
+                        <div class="control">
+                            <input v-model="filters.lastname" class="input is-primary" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-4-desktop">
+                    <div class="field">
+                        <label class="label">Nacimiento</label>
+                        <div class="control">
+                            <input v-model="filters.birthdate" class="input is-primary" type="date">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Fecha Registro</label>
+                        <div class="control">
+                            <input v-model="filters.registrationDate" class="input is-primary" type="date">
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-4-desktop">
+                    <div class="field">
+                        <label class="label">Columna Orden</label>
+                        <div class="control">
+                            <input v-model="filters.orderBy" class="input is-primary" type="text">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Orden</label>
+                        <div class="control">
+                            <input v-model="filters.order" class="input is-primary" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="button is-primary">Buscar</button>
+        </form>
         <div class="table-container">
             <table class="table is-striped is-fullwidth">
                 <thead>
@@ -33,16 +83,38 @@
         </div>
         <div>
             <nav class="pagination is-centered" role="navigation" aria-label="pagination">
-                <button :class="{'is-disabled': firstPage, 'is-loading': loading}" @click="fetchData(prevPage)" class="pagination-previous">Previous</button>
-                <button :class="{'is-disabled': lastPage, 'is-loading': loading}" @click="fetchData(nextPage)" class="pagination-next">Next page</button>
+                <button :class="{'is-disabled': firstPage, 'is-loading': loading}" @click="fetchEmployeePage(prevPage)"
+                        class="pagination-previous">Previous
+                </button>
+                <button :class="{'is-disabled': lastPage, 'is-loading': loading}" @click="fetchEmployeePage(nextPage)"
+                        class="pagination-next">Next page
+                </button>
                 <ul class="pagination-list">
-                    <li><button :class="{'is-loading': loading}" class="pagination-link" @click="fetchData(1)" aria-label="Goto page 1">1</button></li>
+                    <li>
+                        <button :class="{'is-loading': loading}" class="pagination-link" @click="fetchEmployeePage(1)"
+                                aria-label="Goto page 1">1
+                        </button>
+                    </li>
                     <li><span class="pagination-ellipsis">&hellip;</span></li>
-                    <li v-if="!firstPage"><button :class="{'is-loading': loading}" class="pagination-link" @click="fetchData(prevPage)" >{{ prevPage }}</button></li>
-                    <li><button :class="{'is-loading': loading}" class="pagination-link is-current">{{ page }}</button></li>
-                    <li v-if="!lastPage"><button :class="{'is-loading': loading}" class="pagination-link" @click="fetchData(nextPage)">{{ nextPage }}</button></li>
+                    <li v-if="!firstPage">
+                        <button :class="{'is-loading': loading}" class="pagination-link" @click="fetchEmployeePage(prevPage)">{{
+                            prevPage }}
+                        </button>
+                    </li>
+                    <li>
+                        <button :class="{'is-loading': loading}" class="pagination-link is-current">{{ page }}</button>
+                    </li>
+                    <li v-if="!lastPage">
+                        <button :class="{'is-loading': loading}" class="pagination-link" @click="fetchEmployeePage(nextPage)">{{
+                            nextPage }}
+                        </button>
+                    </li>
                     <li><span class="pagination-ellipsis">&hellip;</span></li>
-                    <li><button :class="{'is-loading': loading}" class="pagination-link" @click="fetchData(totalPages)">{{ totalPages }}</button></li>
+                    <li>
+                        <button :class="{'is-loading': loading}" class="pagination-link" @click="fetchEmployeePage(totalPages)">
+                            {{ totalPages }}
+                        </button>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -65,15 +137,55 @@
                     lastPage: false,
                     prevPage: 0,
                     nextPage: 2,
+                    filters: {
+                        name: "",
+                        lastname: "",
+                        birthdate: "",
+                        registrationDate: "",
+                        orderBy: "",
+                        order: "ASC",
+                    },
+                    orderByFields: [],
                 }
             },
-            created() {
-                this.fetchData(1)
+            mounted() {
+                this.fetchOrderByFields()
+                this.fetchEmployeePage(1)
             },
             methods: {
-                fetchData(page) {
+                onSubmit(e) {
+                    this.fetchEmployeePage(1)
+                },
+                fetchOrderByFields() {
+                    let url = "/api/v1/employees/search/order-by-fields"
+                    axios.get(url)
+                        .then(result => {
+                            result = result.data
+                            this.orderByFields = result
+                        })
+                },
+                fetchEmployeePage(page) {
                     this.loading = true
-                    axios.get("/api/v1/employees/search?page=" + page + "&size=" + this.size)
+                    let url = "/api/v1/employees/search?page=" + page + "&size=" + this.size
+                    let filters = this.filters
+
+                    if (filters.name) {
+                        url = url + "&name=" + filters.name
+                    }
+                    if (filters.lastname) {
+                        url = url + "&lastname=" + filters.lastname
+                    }
+                    if (filters.birthdate) {
+                        url = url + "&birthdate=" + filters.birthdate
+                    }
+                    if (filters.registrationDate) {
+                        url = url + "&registrationDate=" + filters.registrationDate
+                    }
+                    if (filters.orderBy) {
+                        url = url + "&orderBy=" + filters.orderBy + "&order=" + filters.order
+                    }
+                    console.log(url)
+                    axios.get(url)
                         .then(result => {
                             result = result.data
                             console.log(result)
@@ -89,7 +201,6 @@
                         })
                 },
             },
-
         })
 
         tableApp.mount('#employeesTable')

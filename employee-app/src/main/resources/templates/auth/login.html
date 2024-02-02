@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="headerfiles">
+    <meta charset="UTF-8">
+    <title>Employee System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" rel="stylesheet">
+</head>
+<body>
+<div th:fragment="main" class="container">
+    <div class="columns is-centered">
+        <div class="column is-3">
+            <span th:if="${error}" class="is-danger">Usuario o contraseña incorrectos</span>
+            <form method="POST" th:action="@{login}">
+                <div class="field">
+                    <label class="label">Usuario</label>
+                    <div class="control">
+                        <input name="username" class="input is-success" type="text">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Contraseña</label>
+                    <div class="control">
+                        <input name="password" class="input is-success" type="password">
+                    </div>
+                </div>
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button is-link" type="submit">Ingresar</button>
+                    </div>
+                    <div class="control">
+                        <a th:href="@{/home}" class="button is-link is-light">Cancelar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
