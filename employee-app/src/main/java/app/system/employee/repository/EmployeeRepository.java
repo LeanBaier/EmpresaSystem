@@ -1,13 +1,8 @@
 package app.system.employee.repository;
 
-import app.system.employee.dto.PagedData;
 import app.system.employee.model.EmployeeModel;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface EmployeeRepository {
-
-    EmployeeModel save(EmployeeModel employeeModel);
-
-    PagedData<EmployeeModel> getEmployeeModels(Integer page, Integer size);
-
-    void deleteById(Long idEmployee);
+public interface EmployeeRepository extends JpaRepository<EmployeeModel, Long>, JpaSpecificationExecutor<EmployeeModel> {
 }

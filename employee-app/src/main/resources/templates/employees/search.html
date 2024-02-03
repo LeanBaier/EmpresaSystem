@@ -6,117 +6,143 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
-<div th:fragment="main" class="container" sec:authorize="hasRole('ROLE_USER')">
-    <div class="block" id="employeesTable">
-        <form @submit.prevent="onSubmit">
-            <div class="columns">
-                <div class="column is-4-desktop">
-                    <div class="field">
-                        <label class="label">Nombre</label>
-                        <div class="control">
-                            <input v-model="filters.name" class="input is-primary" type="text">
-                        </div>
-                    </div>
+<div class="container has-background-grey-lighter" sec:authorize="hasRole('ROLE_USER')" th:fragment="main">
+    <div class="section" id="employeesTable">
+        <div class="columns">
+            <div class="column is-2-desktop">
+                <form @submit.prevent="onSubmit">
+                    <div class="columns">
+                        <div class="column">
 
-                    <div class="field">
-                        <label class="label">Apellido</label>
-                        <div class="control">
-                            <input v-model="filters.lastname" class="input is-primary" type="text">
+                            <div class="field">
+                                <label class="label is-size-7">Tamaño Página</label>
+                                <div class="control">
+                                    <label>
+                                        <input v-model="size" class="input is-small" type="number">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label is-size-7">Nombre</label>
+                                <div class="control">
+                                    <input v-model="filters.name" class="input is-small" type="text">
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label is-size-7">Apellido</label>
+                                <div class="control">
+                                    <input v-model="filters.lastname" class="input is-small" type="text">
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label is-size-7">Nacimiento</label>
+                                <div class="control">
+                                    <input v-model="filters.birthdate" class="input is-small" type="date">
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label is-size-7">Fecha Registro</label>
+                                <div class="control">
+                                    <input v-model="filters.registrationDate" class="input is-small"
+                                           type="date">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label is-size-7">Ordenamiento</label>
+                                <div class="select is-small">
+                                    <select>
+                                        <option v-for="field in orderByFields">{{ field.fieldName }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label is-size-7">Orden</label>
+                                <div class="select is-small">
+                                    <select>
+                                        <option>Ascendiente</option>
+                                        <option>Descendiente</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <button type="submit" class="button is-primary">Buscar</button>
+                </form>
+            </div>
+            <div class="column">
+                <div class="table-container">
+                    <table class="table is-striped is-fullwidth">
+                        <thead>
+                        <tr>
+                            <th>Acciones</th>
+                            <th>Legajo</th>
+                            <th>Empleado</th>
+                            <th>Fecha Nacimiento</th>
+                            <th>Fecha Ingreso</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-if="employees" v-for="employee in employees" :key="employee.idEmployee">
+                            <td></td>
+                            <td>{{employee.idEmployee}}</td>
+                            <td>{{employee.name}} {{employee.lastname}}</td>
+                            <td>{{employee.birthdate}}</td>
+                            <td>{{employee.registrationDate}}</td>
+                        </tr>
+                        </tbody>
+
+                    </table>
                 </div>
-                <div class="column is-4-desktop">
-                    <div class="field">
-                        <label class="label">Nacimiento</label>
-                        <div class="control">
-                            <input v-model="filters.birthdate" class="input is-primary" type="date">
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Fecha Registro</label>
-                        <div class="control">
-                            <input v-model="filters.registrationDate" class="input is-primary" type="date">
-                        </div>
-                    </div>
-                </div>
-                <div class="column is-4-desktop">
-                    <div class="field">
-                        <label class="label">Columna Orden</label>
-                        <div class="control">
-                            <input v-model="filters.orderBy" class="input is-primary" type="text">
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Orden</label>
-                        <div class="control">
-                            <input v-model="filters.order" class="input is-primary" type="text">
-                        </div>
-                    </div>
+                <div>
+                    <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                        <button :class="{'is-disabled': firstPage, 'is-loading': loading}"
+                                @click="fetchEmployeePage(prevPage)"
+                                class="pagination-previous">Previous
+                        </button>
+                        <button :class="{'is-disabled': lastPage, 'is-loading': loading}"
+                                @click="fetchEmployeePage(nextPage)"
+                                class="pagination-next">Next page
+                        </button>
+                        <ul class="pagination-list">
+                            <li>
+                                <button :class="{'is-loading': loading}" class="pagination-link"
+                                        @click="fetchEmployeePage(1)"
+                                        aria-label="Goto page 1">1
+                                </button>
+                            </li>
+                            <li><span class="pagination-ellipsis">&hellip;</span></li>
+                            <li v-if="!firstPage">
+                                <button :class="{'is-loading': loading}" class="pagination-link"
+                                        @click="fetchEmployeePage(prevPage)">{{
+                                    prevPage }}
+                                </button>
+                            </li>
+                            <li>
+                                <button :class="{'is-loading': loading}" class="pagination-link is-current">{{ page }}
+                                </button>
+                            </li>
+                            <li v-if="!lastPage">
+                                <button :class="{'is-loading': loading}" class="pagination-link"
+                                        @click="fetchEmployeePage(nextPage)">{{
+                                    nextPage }}
+                                </button>
+                            </li>
+                            <li><span class="pagination-ellipsis">&hellip;</span></li>
+                            <li>
+                                <button :class="{'is-loading': loading}" class="pagination-link"
+                                        @click="fetchEmployeePage(totalPages)">
+                                    {{ totalPages }}
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
-            <button type="submit" class="button is-primary">Buscar</button>
-        </form>
-        <div class="table-container">
-            <table class="table is-striped is-fullwidth">
-                <thead>
-                <tr>
-                    <th>Acciones</th>
-                    <th>Legajo</th>
-                    <th>Empleado</th>
-                    <th>Fecha Nacimiento</th>
-                    <th>Fecha Ingreso</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-if="employees" v-for="employee in employees" :key="employee.idEmployee">
-                    <td></td>
-                    <td>{{employee.idEmployee}}</td>
-                    <td>{{employee.name}} {{employee.lastname}}</td>
-                    <td>{{employee.birthdate}}</td>
-                    <td>{{employee.registrationDate}}</td>
-                </tr>
-                </tbody>
-
-            </table>
-        </div>
-        <div>
-            <nav class="pagination is-centered" role="navigation" aria-label="pagination">
-                <button :class="{'is-disabled': firstPage, 'is-loading': loading}" @click="fetchEmployeePage(prevPage)"
-                        class="pagination-previous">Previous
-                </button>
-                <button :class="{'is-disabled': lastPage, 'is-loading': loading}" @click="fetchEmployeePage(nextPage)"
-                        class="pagination-next">Next page
-                </button>
-                <ul class="pagination-list">
-                    <li>
-                        <button :class="{'is-loading': loading}" class="pagination-link" @click="fetchEmployeePage(1)"
-                                aria-label="Goto page 1">1
-                        </button>
-                    </li>
-                    <li><span class="pagination-ellipsis">&hellip;</span></li>
-                    <li v-if="!firstPage">
-                        <button :class="{'is-loading': loading}" class="pagination-link" @click="fetchEmployeePage(prevPage)">{{
-                            prevPage }}
-                        </button>
-                    </li>
-                    <li>
-                        <button :class="{'is-loading': loading}" class="pagination-link is-current">{{ page }}</button>
-                    </li>
-                    <li v-if="!lastPage">
-                        <button :class="{'is-loading': loading}" class="pagination-link" @click="fetchEmployeePage(nextPage)">{{
-                            nextPage }}
-                        </button>
-                    </li>
-                    <li><span class="pagination-ellipsis">&hellip;</span></li>
-                    <li>
-                        <button :class="{'is-loading': loading}" class="pagination-link" @click="fetchEmployeePage(totalPages)">
-                            {{ totalPages }}
-                        </button>
-                    </li>
-                </ul>
-            </nav>
         </div>
     </div>
     <script th:src="@{/js/vue.global.js}"></script>

@@ -19,7 +19,7 @@ public class PagedData<DATA> implements Serializable {
     private Integer page;
     private Integer size;
     private Integer totalPages;
-    private Integer totalRecords;
+    private Long totalRecords;
     private List<DATA> data;
 
 }

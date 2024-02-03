@@ -1,6 +1,6 @@
 package app.system.employee.validators;
 
-import app.system.employee.validators.impl.OrderByFieldEnumValidatorImpl;
+import app.system.employee.validators.impl.AscDescValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -15,13 +15,12 @@ import static java.lang.annotation.ElementType.PARAMETER;
 @Target({FIELD, PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Constraint(validatedBy = OrderByFieldEnumValidatorImpl.class)
-public @interface OrderByFieldEnumValidator {
-
+@Constraint(validatedBy = AscDescValidator.class)
+public @interface AscDesc {
 
     boolean required() default false;
 
-    String message() default "";
+    String message() default "Value must be ASC or DESC.";
 
     Class<?>[] groups() default {};
 

@@ -1,6 +1,6 @@
 package app.system.employee.validators;
 
-import app.system.employee.validators.impl.AscDescValidatorImpl;
+import app.system.employee.validators.impl.DateFormatValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -15,14 +15,17 @@ import static java.lang.annotation.ElementType.PARAMETER;
 @Target({FIELD, PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Constraint(validatedBy = AscDescValidatorImpl.class)
-public @interface AscDescValidator {
+@Constraint(validatedBy = DateFormatValidator.class)
+public @interface DateFormat {
 
     boolean required() default false;
 
-    String message() default "Value must be ASC or DESC.";
+    String pattern();
+
+    String message() default "";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
 }

@@ -1,8 +1,8 @@
-package app.system.employee.dto;
+package app.system.employee.dto.request;
 
-import app.system.employee.validators.AscDescValidator;
-import app.system.employee.validators.OrderByFieldEnumValidator;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import app.system.employee.validators.AscDesc;
+import app.system.employee.validators.DateFormat;
+import app.system.employee.validators.OrderByFieldEnum;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,15 +26,19 @@ public class GetEmployeesRequest implements Serializable {
     @NotNull
     @Positive
     private Integer size;
-    @AscDescValidator
+    @AscDesc
     private String order;
     private String name;
     private String lastname;
-    @OrderByFieldEnumValidator
+    @OrderByFieldEnum
     private String orderBy;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date birthdate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date registrationDate;
+    @DateFormat(pattern = "yyyy-MM-dd")
+    private String birthdateSince;
+    @DateFormat(pattern = "yyyy-MM-dd")
+    private String birthdateUntil;
+    @DateFormat(pattern = "yyyy-MM-dd")
+    private String registrationDateSince;
+    @DateFormat(pattern = "yyyy-MM-dd")
+    private String registrationDateUntil;
 }
 

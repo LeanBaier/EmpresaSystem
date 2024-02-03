@@ -1,17 +1,17 @@
 package app.system.employee.validators.impl;
 
-import app.system.employee.validators.AscDescValidator;
+import app.system.employee.validators.AscDesc;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.Objects;
 
-public class AscDescValidatorImpl implements ConstraintValidator<AscDescValidator, String> {
+public class AscDescValidator implements ConstraintValidator<AscDesc, String> {
 
     private boolean required;
 
     @Override
-    public void initialize(AscDescValidator constraintAnnotation) {
+    public void initialize(AscDesc constraintAnnotation) {
         this.required = constraintAnnotation.required();
     }
 

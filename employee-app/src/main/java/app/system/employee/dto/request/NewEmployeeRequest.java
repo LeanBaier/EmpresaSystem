@@ -1,4 +1,4 @@
-package app.system.employee.dto;
+package app.system.employee.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-public class NewEmployeeDTO implements Serializable {
+public class NewEmployeeRequest implements Serializable {
 
     private String name;
     private String lastname;

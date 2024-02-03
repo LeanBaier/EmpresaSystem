@@ -1,4 +1,4 @@
-package app.system.employee.dto;
+package app.system.employee.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,9 +13,9 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
-public class FieldOrderDTO implements Serializable {
+public class LoginRequestDTO implements Serializable {
 
-    private String orderByFieldName;
-    private String employeeModelField;
+    private String username;
+    private String password;
 
 }

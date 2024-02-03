@@ -8,7 +8,9 @@
 <body>
 <header th:replace="~{fragments/header :: header}"></header>
 
-<main th:replace="~{${fragmentName} :: ${fragmentTag}}"></main>
+<div class="has-background-primary-light">
+    <main th:replace="~{${fragmentName} :: ${fragmentTag}}"></main>
+</div>
 
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 

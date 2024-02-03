@@ -1,7 +1,8 @@
 package app.system.employee.api;
 
-import app.system.employee.dto.FieldOrderDTO;
-import app.system.employee.dto.GetEmployeesRequest;
+import app.system.employee.dto.response.EmployeeDTO;
+import app.system.employee.dto.response.FieldOrderDTO;
+import app.system.employee.dto.request.GetEmployeesRequest;
 import app.system.employee.dto.PagedData;
 import app.system.employee.enums.EmployeeOrderByFieldEnum;
 import app.system.employee.model.EmployeeModel;
@@ -32,7 +33,7 @@ public class EmployeeApiController {
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('USER')")
-    public PagedData<EmployeeModel> searchEmployees(@Valid GetEmployeesRequest filters) {
+    public PagedData<EmployeeDTO> searchEmployees(@Valid GetEmployeesRequest filters) {
         return employeeService.getEmployees(filters);
     }
 
@@ -41,7 +42,7 @@ public class EmployeeApiController {
         return Arrays.stream(EmployeeOrderByFieldEnum.values())
                      .map(f -> FieldOrderDTO.builder()
                                             .orderByFieldName(f.name())
-                                            .employeeModelField(f.getField())
+                                            .fieldName(f.getFieldName())
                                             .build())
                      .toList();
     }
