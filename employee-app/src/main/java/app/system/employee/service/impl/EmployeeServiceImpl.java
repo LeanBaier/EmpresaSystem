@@ -1,8 +1,8 @@
 package app.system.employee.service.impl;
 
 import app.system.employee.dto.PagedData;
-import app.system.employee.dto.request.GetEmployeesRequest;
-import app.system.employee.dto.request.NewEmployeeRequest;
+import app.system.employee.dto.request.GetEmployeesDTO;
+import app.system.employee.dto.request.NewEmployeeDTO;
 import app.system.employee.dto.response.EmployeeDTO;
 import app.system.employee.enums.EmployeeOrderByFieldEnum;
 import app.system.employee.mapper.EmployeeMapper;
@@ -25,12 +25,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
 
     @Override
-    public void createEmployee(NewEmployeeRequest newEmployee) {
+    public void createEmployee(NewEmployeeDTO newEmployee) {
 
     }
 
     @Override
-    public PagedData<EmployeeDTO> getEmployees(GetEmployeesRequest request) {
+    public PagedData<EmployeeDTO> getEmployees(GetEmployeesDTO request) {
         Sort sort = Sort.by(EmployeeOrderByFieldEnum.findByName(request.getOrderBy())
                                                     .getField());
         sort = (Objects.nonNull(request.getOrder()) && request.getOrder()

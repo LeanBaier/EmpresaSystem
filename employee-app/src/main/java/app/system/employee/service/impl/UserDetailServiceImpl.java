@@ -1,73 +1,38 @@
 package app.system.employee.service.impl;
 
-import org.springframework.security.core.GrantedAuthority;
+import app.system.employee.model.SyUserModel;
+import app.system.employee.repository.SyUserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserDetailServiceImpl implements UserDetailsService {
 
-    private final List<UserDetails> users;
-    private final BCryptPasswordEncoder passwordEncoder;
-
-    public UserDetailServiceImpl() {
-        this.users = new ArrayList<>();
-        this.passwordEncoder = new BCryptPasswordEncoder();
-
-        for (int i = 1; i <= 10; i++) {
-            int finalI = i;
-            this.users.add(new UserDetails() {
-                @Override
-                public Collection<? extends GrantedAuthority> getAuthorities() {
-                    return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-                }
-
-                @Override
-                public String getPassword() {
-                    return passwordEncoder.encode("pass" + finalI);
-                }
-
-                @Override
-                public String getUsername() {
-                    return "user" + finalI;
-                }
-
-                @Override
-                public boolean isAccountNonExpired() {
-                    return true;
-                }
-
-                @Override
-                public boolean isAccountNonLocked() {
-                    return true;
-                }
-
-                @Override
-                public boolean isCredentialsNonExpired() {
-                    return true;
-                }
-
-                @Override
-                public boolean isEnabled() {
-                    return true;
-                }
-            });
-        }
-    }
+    private final SyUserRepository userRepository;
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return this.users.stream()
-                         .filter(u -> u.getUsername().equals(username))
-                         .findAny()
-                         .orElseThrow(() -> new UsernameNotFoundException(username));
+        SyUserModel user = userRepository.findById(username)
+                                         .orElseThrow(() -> new UsernameNotFoundException(username));
+
+        List<SimpleGrantedAuthority> grants = new ArrayList<>();
+        user.getRoles().forEach(r -> {
+            r.getGrants().forEach(g -> {
+                grants.add(new SimpleGrantedAuthority(r.getDescription()));
+            });
+        });
+
+        return new User(user.getUsername(), user.getPassword(), grants);
     }
 }
