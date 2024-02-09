@@ -4,9 +4,9 @@ import HeaderComponent from "@/components/HeaderComponent.vue";
 </script>
 
 <template>
-  <HeaderComponent/>
+  <HeaderComponent :key="$route.fullPath"/>
   <div class="container">
-    <RouterView/>
+    <RouterView />
   </div>
 </template>
 

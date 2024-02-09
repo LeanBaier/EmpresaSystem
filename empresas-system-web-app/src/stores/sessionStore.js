@@ -7,14 +7,15 @@ export const userSession = defineStore('userSession', {
         expirationAccessToken: 0,
     }),
     getters: {
+        getAccessToken: (state) => state.accessToken ,
         async sessionToken(refreshSession) {
             if (refreshSession) {
                 let data = {
-                    refreshToken: state.refreshToken,
+                    refreshToken: this.refreshToken,
                 }
                 let headers = new Headers();
                 headers.append('Content-Type', 'application/json')
-                let result = await fetch("http://localhost:8080/api/v1/auth/token", {
+                await fetch("http://localhost:8080/api/v1/auth/token", {
                     method: 'POST',
                     mode: 'cors',
                     headers: headers,
@@ -26,7 +27,7 @@ export const userSession = defineStore('userSession', {
                     this.expirationAccessToken = result.expires
                 }).catch((e) => console.log(e))
             }
-            return state.accessToken
+            return this.getAccessToken
         }
     },
     actions: {
@@ -37,17 +38,23 @@ export const userSession = defineStore('userSession', {
             }
             let headers = new Headers();
             headers.append('Content-Type', 'application/json')
-            let result = await fetch("http://localhost:8080/api/v1/auth/login", {
+            await fetch("http://localhost:8080/api/v1/auth/login", {
                 method: 'POST',
                 mode: 'cors',
                 headers: headers,
                 body: JSON.stringify(data)
             }).then(async (result) => {
                 result = await result.json()
+                console.log(result)
                 this.accessToken = result.accessToken
                 this.refreshToken = result.refreshToken
                 this.expirationAccessToken = result.expires
             }).catch((e) => console.log(e))
+        },
+        logout() {
+            this.accessToken = ''
+            this.refreshToken = ''
+            this.expirationAccessToken = 0
         }
     }
 })

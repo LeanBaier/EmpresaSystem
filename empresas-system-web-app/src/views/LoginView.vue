@@ -8,13 +8,14 @@ export default {
     password: "",
   }),
   methods: {
-    login() {
-      console.log(userSession().login(this.username, this.password))
-
-      if (userSession().$state.accessToken){
-        router.push("/home")
+    async login() {
+      await userSession().login(this.username, this.password)
+      const session = userSession().$state.accessToken
+      console.log(session)
+      if (session){
+        await router.push("/home")
       } else {
-        router.push("/login?error=true")
+        await router.push("/login?error=true")
       }
     }
   }
@@ -22,8 +23,8 @@ export default {
 </script>
 
 <template>
-  <div class="columns is-centered">
-    <div class="column is-4-desktop">
+  <div class="columns is-centered ">
+    <div class="column is-4-desktop m-6">
       <form @submit.prevent="login">
         <div class="field">
           <label class="label">Usuario</label>
@@ -39,12 +40,12 @@ export default {
           </div>
         </div>
 
-        <div class="field is-grouped">
+        <div class="field is-grouped is-grouped-right ">
           <div class="control">
-            <button class="button is-link">Submit</button>
+            <RouterLink to="/register" class="button is-primary is-light">Registrarse</RouterLink>
           </div>
           <div class="control">
-            <button class="button is-link is-light">Cancel</button>
+            <button class="button is-primary">Ingresar</button>
           </div>
         </div>
       </form>

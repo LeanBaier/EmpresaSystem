@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     async fetchEmployees(page) {
-      let url = new URL("http://localhost:8080/api/v1/employees")
+      let url = new URL("http://localhost:8080/api/v1/employees/search")
       url.searchParams.append('page', page)
       url.searchParams.append('size', this.pageOptions.size)
       if (this.filters.name) {
@@ -49,7 +49,6 @@ export default {
       }
 
       let sessionToken = userSession().accessToken
-      console.log(sessionToken)
       await fetch(url, {
         method: 'GET',
         mode: 'cors',
@@ -71,8 +70,8 @@ export default {
 </script>
 <template>
   <div class="container">
-    <div class="columns">
-      <div class="column is-2-desktop">
+    <div class="columns m-1">
+      <div class="column is-2-desktop mt-6">
         <form @submit.prevent="fetchEmployees(1)">
           <div class="field">
             <label class="label">Registros por Página</label>
@@ -95,23 +94,25 @@ export default {
           <div class="field">
             <label class="label">Fecha Nacimiento</label>
             <div class="control">
-              <input class="input" v-model="filters.lowerBirthdate" type="date">
+              <input class="input mb-1" v-model="filters.lowerBirthdate" type="date">
               <input class="input" v-model="filters.higherBirthdate" type="date">
             </div>
           </div>
           <div class="field">
             <label class="label">Fecha Registro</label>
             <div class="control">
-              <input class="input" v-model="filters.lowerRegistrationDate" type="date">
+              <input class="input mb-1" v-model="filters.lowerRegistrationDate" type="date">
               <input class="input" v-model="filters.higherRegistrationDate" type="date">
             </div>
           </div>
-          <button type="submit" class="button is-primary" value="Buscar"></button>
+          <div class="field mt-5">
+            <button type="submit" class="button is-primary is-fullwidth">Buscar</button>
+          </div>
         </form>
       </div>
-      <div class="column">
-        <div class="container">
-          <table class="table">
+      <div class="column mt-5">
+        <div class="container mb-3">
+          <table class="table is-fullwidth" aria-label="Tabla de empleados">
             <thead>
             <tr>
               <th>Acciones</th>
@@ -135,7 +136,7 @@ export default {
           </table>
         </div>
         <div class="container">
-          <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+          <nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
             <button @onclick="fetchEmployees(pageOptions.actualPage - 1)" type="button"
                     v-bind:class="{'is-disabled': !pageOptions.hasPreviousPage}" class="pagination-previous">Anterior
             </button>
@@ -155,7 +156,7 @@ export default {
               </li>
               <li>
                 <button type="button" @onclick="fetchEmployees(pageOptions.actualPage)"
-                        class="pagination-link is-current">{{ pageOptions.actualPage }}
+                        class="pagination-link is-current  ">{{ pageOptions.actualPage }}
                 </button>
               </li>
               <li v-if="pageOptions.hasNextPage">
@@ -177,6 +178,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style>
-</style>

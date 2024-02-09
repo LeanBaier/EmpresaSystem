@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=empresa_system
+    username: postgres
+    password: empresas-system-db
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: postgres-pool
+      maximum-pool-size: 10
+token:
+  signing:
+    key: bXktc2VjcmV0LWtleS1mb3ItZW1wcmVzYS1zeXN0ZW0tYXBwLWp3dA==
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE
