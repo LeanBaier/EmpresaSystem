@@ -12,14 +12,16 @@ export default {
     errorBirthdate: '',
     textInputOptions: {format: 'dd/MM/yyyy'},
     created: false,
+    loading: false,
   }),
   updated() {
-    if (this.created){
+    if (this.created) {
       router.push('/employees')
     }
   },
   methods: {
     async createEmployee() {
+      this.loading = true
       if (!this.name) {
         this.errorName = 'Debe ingresar un nombre'
       } else {
@@ -36,6 +38,7 @@ export default {
         this.errorLastname = ''
       }
       if (this.errorName || this.errorLastname || this.errorBirthdate) {
+        this.loading = false
         return
       }
       let birthdate = this.birthdate
@@ -51,7 +54,10 @@ export default {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(data),
-      }).then(response => this.created = response.ok)
+      }).then(response => {
+        this.created = response.ok
+        this.loading = false
+      })
           .catch(e => console.log(e))
     }
   }
@@ -91,7 +97,7 @@ export default {
           <div class="control">
             <RouterLink to="/employees" class="button is-primary is-light">Cancelar</RouterLink>
           </div>
-          <button class="button is-primary" type="submit">Guardar</button>
+          <button class="button is-primary" :class="{'is-loading': loading}" type="submit">Guardar</button>
         </div>
       </form>
     </div>

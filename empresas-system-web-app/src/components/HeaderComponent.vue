@@ -35,7 +35,7 @@ export default {
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons" v-if="sessionActive">
-              <RouterLink class="button is-outlined" to="/logout">
+              <RouterLink class="button is-outlined" to="/login">
                 Salir
               </RouterLink>
             </div>
