@@ -15,17 +15,19 @@ export default {
     pageOptions: {
       actualPage: 1,
       size: 10,
-      hasNextPage: false,
-      hasPreviousPage: false,
+      hasNextPage: true,
+      hasPreviousPage: true,
       totalPages: 0,
       totalRecords: 0,
-    }
+    },
+    loadingPage: true
   }),
   mounted() {
     this.fetchEmployees(1)
   },
   methods: {
     async fetchEmployees(page) {
+      this.loadingPage = true
       let url = new URL("http://localhost:8080/api/v1/employees/search")
       url.searchParams.append('page', page)
       url.searchParams.append('size', this.pageOptions.size)
@@ -47,8 +49,7 @@ export default {
       if (this.filters.higherRegistrationDate) {
         url.searchParams.append('registrationDateUntil', this.filters.higherRegistrationDate)
       }
-
-      let sessionToken = userSession().accessToken
+      let sessionToken = await userSession().accessToken
       await fetch(url, {
         method: 'GET',
         mode: 'cors',
@@ -61,8 +62,10 @@ export default {
         this.employees = result.data
         this.pageOptions.totalPages = result.totalPages
         this.pageOptions.totalRecords = result.totalRecords
-        this.pageOptions.hasNextPage = this.totalPages > this.page
-        this.pageOptions.hasPreviousPage = this.page > 1
+        this.pageOptions.hasNextPage = result.totalPages > page
+        this.pageOptions.hasPreviousPage = page > 1
+        this.pageOptions.actualPage = page
+        this.loadingPage = false
       }).catch((e) => console.log(e))
     },
   }
@@ -73,7 +76,8 @@ export default {
     <div class="columns m-1">
       <div class="column is-2-desktop mt-6">
         <div class="container mb-6">
-          <RouterLink to="/employees/new" class="button is-info is-outlined is-fullwidth">Registrar Empleado</RouterLink>
+          <RouterLink to="/employees/new" class="button is-info is-outlined is-fullwidth">Alta Empleado
+          </RouterLink>
         </div>
         <form @submit.prevent="fetchEmployees(1)">
           <div class="field">
@@ -109,7 +113,8 @@ export default {
             </div>
           </div>
           <div class="field mt-5">
-            <button type="submit" class="button is-primary is-fullwidth">Buscar</button>
+            <button type="submit" :class="{'is-loading': loadingPage}" class="button is-primary is-fullwidth">Buscar
+            </button>
           </div>
         </form>
       </div>
@@ -131,8 +136,8 @@ export default {
               <td></td>
               <td>{{ employee.name }}</td>
               <td> {{ employee.lastname }}</td>
-              <td> {{ employee.birthdate }}</td>
-              <td> {{ employee.registrationDate }}</td>
+              <td> {{ new Date(employee.birthdate).toLocaleDateString() }}</td>
+              <td> {{ new Date(employee.registrationDate).toLocaleDateString() }}</td>
               <td> {{ employee.idEmployee }}</td>
             </tr>
             </tbody>
@@ -140,36 +145,44 @@ export default {
         </div>
         <div class="container">
           <nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
-            <button @onclick="fetchEmployees(pageOptions.actualPage - 1)" type="button"
-                    v-bind:class="{'is-disabled': !pageOptions.hasPreviousPage}" class="pagination-previous">Anterior
+            <button @click="fetchEmployees(pageOptions.actualPage - 1)" type="button"
+                    v-bind:class="{'is-disabled': !pageOptions.hasPreviousPage || loadingPage}"
+                    class="pagination-previous">Anterior
             </button>
-            <button @onclick="fetchEmployees(pageOptions.actualPage + 1)" type="button"
-                    v-bind:class="{'is-disabled': !pageOptions.hasNextPage}" class="pagination-next">Proxima
+            <button @click="fetchEmployees(pageOptions.actualPage + 1)" type="button"
+                    v-bind:class="{'is-disabled': !pageOptions.hasNextPage || loadingPage}" class="pagination-next">
+              Proxima
             </button>
             <ul class="pagination-list">
               <li>
-                <button @onclick="fetchEmployees(1)" class="pagination-link" aria-label="Goto page 1">1</button>
+                <button @click="fetchEmployees(1)" :class="{'is-disabled': loadingPage}" class="pagination-link"
+                        aria-label="Goto page 1">1
+                </button>
               </li>
               <li><span class="pagination-ellipsis">&hellip;</span></li>
               <li v-if="pageOptions.hasPreviousPage">
-                <button type="button" @onclick="fetchEmployees(pageOptions.actualPage - 1)" class="pagination-link">{{
+                <button type="button" :class="{'is-disabled': loadingPage}"
+                        @click="fetchEmployees(pageOptions.actualPage - 1)" class="pagination-link">{{
                     pageOptions.actualPage - 1
                   }}
                 </button>
               </li>
               <li>
-                <button type="button" @onclick="fetchEmployees(pageOptions.actualPage)"
+                <button type="button" @click="fetchEmployees(pageOptions.actualPage)"
+                        :class="{'is-disabled': loadingPage}"
                         class="pagination-link is-current  ">{{ pageOptions.actualPage }}
                 </button>
               </li>
               <li v-if="pageOptions.hasNextPage">
-                <button type="button" @onclick="fetchEmployees(pageOptions.actualPage + 1)" class="pagination-link">
+                <button type="button" @click="fetchEmployees(pageOptions.actualPage + 1)" class="pagination-link"
+                        :class="{'is-disabled': loadingPage}">
                   {{ pageOptions.actualPage + 1 }}
                 </button>
               </li>
               <li><span class="pagination-ellipsis">&hellip;</span></li>
               <li>
-                <button type="button" @onclick="fetchEmployees(pageOptions.totalPages)" class="pagination-link">
+                <button type="button" @click="fetchEmployees(pageOptions.totalPages)" class="pagination-link"
+                        :class="{'is-disabled': loadingPage}">
                   {{ pageOptions.totalPages }}
                 </button>
               </li>
