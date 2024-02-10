@@ -72,6 +72,9 @@ export default {
   <div class="container">
     <div class="columns m-1">
       <div class="column is-2-desktop mt-6">
+        <div class="container mb-6">
+          <RouterLink to="/employees/new" class="button is-info is-outlined is-fullwidth">Registrar Empleado</RouterLink>
+        </div>
         <form @submit.prevent="fetchEmployees(1)">
           <div class="field">
             <label class="label">Registros por Página</label>

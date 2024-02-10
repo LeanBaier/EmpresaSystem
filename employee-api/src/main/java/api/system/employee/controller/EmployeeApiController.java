@@ -1,26 +1,20 @@
 package api.system.employee.controller;
 
 import api.system.employee.dto.PagedData;
-import api.system.employee.enums.EmployeeOrderByFieldEnum;
-import api.system.employee.service.EmployeeService;
-import api.system.employee.dto.response.EmployeeDTO;
-import api.system.employee.dto.response.FieldOrderDTO;
 import api.system.employee.dto.request.GetEmployeesDTO;
+import api.system.employee.dto.request.NewEmployeeDTO;
+import api.system.employee.dto.response.EmployeeDTO;
+import api.system.employee.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Arrays;
-import java.util.List;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/employees")
 @RequiredArgsConstructor
+@Validated
 public class EmployeeApiController {
 
     private final EmployeeService employeeService;
@@ -36,14 +30,10 @@ public class EmployeeApiController {
         return employeeService.getEmployees(filters);
     }
 
-    @GetMapping("/search/order-by-fields")
-    public List<FieldOrderDTO> orderByFields() {
-        return Arrays.stream(EmployeeOrderByFieldEnum.values())
-                     .map(f -> FieldOrderDTO.builder()
-                                            .orderByFieldName(f.name())
-                                            .fieldName(f.getFieldName())
-                                            .build())
-                     .toList();
+    @PostMapping
+    @PreAuthorize("hasRole('EMPLOYEES')")
+    public EmployeeDTO createEmployee(@RequestBody @Valid NewEmployeeDTO request) {
+        return employeeService.createEmployee(request);
     }
 
 }

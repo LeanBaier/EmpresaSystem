@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface EmployeeService {
 
-    void createEmployee(NewEmployeeDTO newEmployee);
+    EmployeeDTO createEmployee(NewEmployeeDTO newEmployee);
 
     PagedData<EmployeeDTO> getEmployees(GetEmployeesDTO request);
 
