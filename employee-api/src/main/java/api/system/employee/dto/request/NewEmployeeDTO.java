@@ -1,6 +1,6 @@
 package api.system.employee.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import api.system.employee.validators.DateFormat;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +19,7 @@ public class NewEmployeeDTO implements Serializable {
     private String name;
     @NotBlank
     private String lastname;
-    @JsonFormat(pattern = "dd-MM-yyyy", shape = JsonFormat.Shape.STRING)
-    private Date birthDate;
+    @DateFormat(pattern = "dd-MM-yyyy")
+    private String birthdate;
 
 }

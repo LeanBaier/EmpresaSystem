@@ -11,6 +11,7 @@ import api.system.employee.repository.EmployeeRepository;
 import api.system.employee.repository.spec.EmployeeSpecifications;
 import api.system.employee.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,6 +26,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
 
+    @SneakyThrows
     @Override
     public EmployeeDTO createEmployee(NewEmployeeDTO newEmployee) {
         EmployeeModel employeeModel = EmployeeMapper.toModel(newEmployee);

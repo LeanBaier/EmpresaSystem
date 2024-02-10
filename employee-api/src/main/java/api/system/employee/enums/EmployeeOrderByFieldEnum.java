@@ -10,6 +10,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public enum EmployeeOrderByFieldEnum {
 
+    ID("idEmployee", "LEGAJO"),
     NAME("name", "Nombre"),
     LASTNAME("lastname", "Apellido"),
     BIRTHDATE("birthdate", "Fecha Nacimiento"),
@@ -20,7 +21,7 @@ public enum EmployeeOrderByFieldEnum {
 
     public static EmployeeOrderByFieldEnum findByName(String name) {
         if (Objects.isNull(name)) {
-            return REGISTRATION_DATE;
+            return ID;
         }
         return Arrays.stream(EmployeeOrderByFieldEnum.values())
                      .filter(v -> v.name().equals(name))
