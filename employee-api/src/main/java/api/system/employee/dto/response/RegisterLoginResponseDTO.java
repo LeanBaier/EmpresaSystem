@@ -17,5 +17,6 @@ public class RegisterLoginResponseDTO implements Serializable {
 
     private String accessToken;
     private String refreshToken;
+    private Long expiresIn;
 
 }

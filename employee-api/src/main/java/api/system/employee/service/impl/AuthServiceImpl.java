@@ -1,10 +1,10 @@
 package api.system.employee.service.impl;
 
 import api.system.employee.dto.request.RegisterLoginRequestDTO;
-import api.system.employee.repository.SyUserRepository;
-import api.system.employee.service.AuthService;
 import api.system.employee.dto.response.RegisterLoginResponseDTO;
 import api.system.employee.model.SyUserModel;
+import api.system.employee.repository.SyUserRepository;
+import api.system.employee.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,16 +27,17 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegisterLoginResponseDTO login(RegisterLoginRequestDTO request) {
         SyUserModel user = userRepository.findById(request.getUsername())
-                                         .orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
+                .orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
 
         List<GrantedAuthority> grants = new ArrayList<>();
         user.getRoles()
-            .forEach(r -> r.getGrants()
-                           .forEach(g -> grants.add(new SimpleGrantedAuthority(g.getName()))));
+                .forEach(r -> r.getGrants()
+                        .forEach(g -> grants.add(new SimpleGrantedAuthority(g.getName()))));
 
         return RegisterLoginResponseDTO.builder()
-                                       .accessToken("Bearer " + jwtService.generateToken(new User(request.getUsername(), request.getPassword(), grants)))
-                                       .build();
+                .accessToken("Bearer " + jwtService.generateToken(new User(request.getUsername(), request.getPassword(), grants)))
+                .expiresIn(300L)
+                .build();
     }
 
     @Override
@@ -46,10 +47,10 @@ public class AuthServiceImpl implements AuthService {
         }
 
         userRepository.save(SyUserModel.builder()
-                                       .password(passwordEncoder.encode(request.getPassword()))
-                                       .username(request.getUsername())
-                                       .email("email@email.com")
-                                       .build());
+                .password(passwordEncoder.encode(request.getPassword()))
+                .username(request.getUsername())
+                .email("email@email.com")
+                .build());
 
         return RegisterLoginResponseDTO.builder().accessToken("TOKEN").build();
     }

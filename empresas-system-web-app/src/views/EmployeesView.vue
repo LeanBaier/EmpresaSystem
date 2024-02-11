@@ -1,5 +1,6 @@
 <script>
 import {userSession} from "@/stores/sessionStore.js";
+import {BIconPencilSquare, BIconTrash3} from "bootstrap-icons-vue";
 
 export default {
   data: () => ({
@@ -22,35 +23,39 @@ export default {
     },
     loadingPage: true
   }),
+  components: {
+    BIconTrash3,
+    BIconPencilSquare
+  },
   mounted() {
     this.fetchEmployees(1)
   },
   methods: {
     async fetchEmployees(page) {
       this.loadingPage = true
-      let url = new URL("http://localhost:8080/api/v1/employees/search")
-      url.searchParams.append('page', page)
-      url.searchParams.append('size', this.pageOptions.size)
+      let searchParams = new URLSearchParams()
+      searchParams.append('page', page)
+      searchParams.append('size', this.pageOptions.size)
       if (this.filters.name) {
-        url.searchParams.append('name', this.filters.name)
+        searchParams.append('name', this.filters.name)
       }
       if (this.filters.lastname) {
-        url.searchParams.append('lastname', this.filters.lastname)
+        searchParams.append('lastname', this.filters.lastname)
       }
       if (this.filters.lowerBirthdate) {
-        url.searchParams.append('birthdateSince', this.filters.lowerBirthdate)
+        searchParams.append('birthdateSince', this.filters.lowerBirthdate)
       }
       if (this.filters.higherBirthdate) {
-        url.searchParams.append('birthdateUntil', this.filters.higherBirthdate)
+        searchParams.append('birthdateUntil', this.filters.higherBirthdate)
       }
       if (this.filters.lowerRegistrationDate) {
-        url.searchParams.append('registrationDateSince', this.filters.lowerRegistrationDate)
+        searchParams.append('registrationDateSince', this.filters.lowerRegistrationDate)
       }
       if (this.filters.higherRegistrationDate) {
-        url.searchParams.append('registrationDateUntil', this.filters.higherRegistrationDate)
+        searchParams.append('registrationDateUntil', this.filters.higherRegistrationDate)
       }
       let sessionToken = await userSession().accessToken
-      await fetch(url, {
+      await fetch("/api-employees/api/v1/employees/search?" + searchParams.toString(), {
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -120,25 +125,34 @@ export default {
       </div>
       <div class="column mt-5">
         <div class="container mb-3">
-          <table class="table is-fullwidth" aria-label="Tabla de empleados">
+          <table class="table is-striped is-hoverable is-fullwidth" aria-label="Tabla de empleados">
             <thead>
             <tr>
-              <th>Acciones</th>
+              <th>Legajo</th>
               <th>Nombre</th>
               <th>Apellido</th>
               <th>Nacimiento</th>
               <th>Fecha Alta</th>
-              <th>Legajo</th>
+              <th>Acciones</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="employee in employees">
-              <td></td>
-              <td>{{ employee.name }}</td>
+              <td> {{ employee.idEmployee }}</td>
+              <td> {{ employee.name }}</td>
               <td> {{ employee.lastname }}</td>
               <td> {{ new Date(employee.birthdate).toLocaleDateString() }}</td>
               <td> {{ new Date(employee.registrationDate).toLocaleDateString() }}</td>
-              <td> {{ employee.idEmployee }}</td>
+              <td class="mgr-small">
+                <div class="buttons">
+                  <button class="button is-small is-danger is-outlined">
+                    <BIconTrash3></BIconTrash3>
+                  </button>
+                  <button class="button is-small is-info is-outlined">
+                    <BIconPencilSquare></BIconPencilSquare>
+                  </button>
+                </div>
+              </td>
             </tr>
             </tbody>
           </table>
@@ -146,10 +160,12 @@ export default {
         <div class="container">
           <nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
             <button @click="fetchEmployees(pageOptions.actualPage - 1)" type="button"
+                    :disabled="!pageOptions.hasPreviousPage || loadingPage"
                     v-bind:class="{'is-disabled': !pageOptions.hasPreviousPage || loadingPage}"
                     class="pagination-previous">Anterior
             </button>
             <button @click="fetchEmployees(pageOptions.actualPage + 1)" type="button"
+                    :disabled="!pageOptions.hasNextPage || loadingPage"
                     v-bind:class="{'is-disabled': !pageOptions.hasNextPage || loadingPage}" class="pagination-next">
               Proxima
             </button>

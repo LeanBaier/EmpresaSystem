@@ -1,18 +1,20 @@
 <script>
-import { userSession} from "@/stores/sessionStore.js";
+import {userSession} from "@/stores/sessionStore.js";
 import router from "@/router/index.js";
 
 export default {
   data: () => ({
     username: "",
     password: "",
+    loading: false,
   }),
   methods: {
     async login() {
+      this.loading = true
       await userSession().login(this.username, this.password)
       const session = userSession().$state.accessToken
       console.log(session)
-      if (session){
+      if (session) {
         await router.push("/home")
       } else {
         await router.push("/login?error=true")
@@ -36,7 +38,8 @@ export default {
         <div class="field">
           <label class="label">Contraseña</label>
           <div class="control">
-            <input class="input" v-model="password" type="password" placeholder="Contraseña">
+            <input class="input" v-model="password" type="password"
+                   placeholder="Contraseña">
           </div>
         </div>
 
@@ -45,7 +48,7 @@ export default {
             <RouterLink to="/register" class="button is-primary is-light">Registrarse</RouterLink>
           </div>
           <div class="control">
-            <button class="button is-primary">Ingresar</button>
+            <button class="button is-primary" :class="{'is-loading': loading}">Ingresar</button>
           </div>
         </div>
       </form>

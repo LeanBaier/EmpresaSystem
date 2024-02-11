@@ -50,11 +50,12 @@ export default {
       let headers = new Headers()
       headers.append("Authorization", userSession().getAccessToken)
       headers.append('Content-Type', 'application/json')
-      await fetch('http://localhost:8080/api/v1/employees', {
+      await fetch('/api-employees/api/v1/employees', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(data),
       }).then(response => {
+        console.log(response.ok)
         this.created = response.ok
         this.loading = false
       })
